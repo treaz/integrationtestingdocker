@@ -1,4 +1,4 @@
-FROM docker.io/mysql:5.7
+FROM docker.io/mysql:@mysql.version@
 
 RUN apt-get update && apt-get install -y vim
 
