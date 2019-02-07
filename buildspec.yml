@@ -1,7 +1,7 @@
 version: 0.2
 
 phases:
-  builds:
+  build:
     commands:
       - chmod +x build.sh
       - ./build.sh int-test
