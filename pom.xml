@@ -7,22 +7,33 @@
     <groupId>com.horiaconstantin</groupId>
     <artifactId>integrationtestingdocker</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <!-- Using docker packaging to bind the most important goals to the relevant lifecycle phases -->
+    <!-- See http://dmp.fabric8.io/#installation -->
+    <!-- I'm not using it here because I want to also bind the docker:remove goal to the post-integration-test -->
+    <!--<packaging>docker</packaging>-->
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <docker.host.address>localhost</docker.host.address>
 
         <mysql-jdbc.version>8.0.13</mysql-jdbc.version>
         <junit.version>4.12</junit.version>
-        <docker-maven-plugin.version>0.27.2</docker-maven-plugin.version>
+        <docker-maven-plugin.version>0.28.0</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M1</maven-surefire-plugin.version>
 
-        <!-- Used in Dockerfile-->
+        <!-- Used in Dockerfile -->
         <mysql.version>5.7</mysql.version>
+
+        <!-- Docker maven plugin global configuration -->
+        <!-- Show the container logs, see http://dmp.fabric8.io/#start-configuration -->
+        <docker.showLogs>true</docker.showLogs>
+        <!-- Show verbose output of the plugin (e.g. build steps) -->
+        <docker.verbose>true</docker.verbose>
+        <!-- This property is not mandatory, but if it's missing the IDE will report an invalid pom -->
+        <docker.host.address>localhost</docker.host.address>
     </properties>
 
 
@@ -47,69 +58,55 @@
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${docker-maven-plugin.version}</version>
+                <!-- Extensions need to be enabled for docker packaging to work -->
+                <extensions>true</extensions>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>mysql-test</name>
+                            <alias>mysql-test</alias>
+                            <build>
+                                <!-- I want to have full control over what is going into the docker image -->
+                                <!-- See http://dmp.fabric8.io/#build-assembly -->
+                                <assembly>
+                                    <descriptor>${project.basedir}/src/test/resources/docker/mysql-test/assembly.xml
+                                    </descriptor>
+                                </assembly>
+                                <dockerFileDir>${project.basedir}/src/test/resources/docker/mysql-test</dockerFileDir>
+                                <dockerFile>Dockerfile</dockerFile>
+                                <!-- The character that is used for variable replacement in the Dockerfile-->
+                                <filter>@</filter>
+                            </build>
+                            <external>
+                                <type>compose</type>
+                                <basedir>${project.basedir}/src/test/resources/docker</basedir>
+                            </external>
+                            <run>
+                                <wait>
+                                    <time>120000</time>
+                                    <log>3306 MySQL Community Server</log>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <!-- I need to manually map the docker goals to the execution phases -->
+                <!-- Unfortunately, mvn help:describe -Dcmd=verify will not show these custom execution mappings -->
                 <executions>
                     <execution>
-                        <id>build-test-containers</id>
+                        <id>start</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>build</goal>
-                        </goals>
-                        <configuration>
-                            <verbose>true</verbose>
-                            <images>
-                                <image>
-                                    <name>mysql-test</name>
-                                    <alias>mysql-test</alias>
-                                    <build>
-                                        <dockerFileDir>${project.basedir}/src/test/resources/docker/mysql-test</dockerFileDir>
-                                        <dockerFile>Dockerfile</dockerFile>
-                                        <filter>@</filter>
-                                        <assembly>
-                                            <descriptor>${project.basedir}/src/test/resources/docker/mysql-test/assembly.xml</descriptor>
-                                        </assembly>
-                                    </build>
-                                </image>
-                            </images>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>run-test-containers</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
                             <goal>start</goal>
                         </goals>
-                        <configuration>
-                            <verbose>true</verbose>
-                            <images>
-                                <image>
-                                    <name>mysql-test</name>
-                                    <alias>mysql-test</alias>
-                                    <external>
-                                        <type>compose</type>
-                                        <basedir>${project.basedir}/src/test/resources/docker</basedir>
-                                    </external>
-                                    <run>
-                                        <wait>
-                                            <time>120000</time>
-                                            <log>3306  MySQL Community Server</log>
-                                        </wait>
-                                        <log>
-                                            <enabled>true</enabled>
-                                            <prefix>TC</prefix>
-                                            <color>yellow</color>
-                                        </log>
-                                    </run>
-                                </image>
-                            </images>
-                            <imagePullPolicy>IfNotPresent</imagePullPolicy>
-                        </configuration>
                     </execution>
                     <execution>
-                        <id>stop-test-containers</id>
+                        <id>stop</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>stop</goal>
+                            <goal>remove</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -135,6 +132,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- We don't care about unit tests in this project, so we're skipping them -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
