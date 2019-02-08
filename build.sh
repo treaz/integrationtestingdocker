@@ -11,7 +11,7 @@ if [ $# -eq 0 ]; then
   instruction
   exit 1
 elif [ "$1" = "int-test" ] && [ $# -eq 1 ]; then
-  mvn clean install
+  mvn clean
 
   mvn verify
 else
