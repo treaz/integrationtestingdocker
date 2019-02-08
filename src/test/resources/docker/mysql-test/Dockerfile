@@ -1,6 +1,8 @@
+# The mysql.version is a property in pom.xml
 FROM docker.io/mysql:@mysql.version@
 
-RUN apt-get update && apt-get install -y vim
+# Install vim to make debugging easier
+#RUN apt-get update && apt-get install -y vim
 
 # Copy DB init scripts to the place where they will be picked up during the start of the container
 COPY maven/sql/*.sql /docker-entrypoint-initdb.d/
