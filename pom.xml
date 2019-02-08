@@ -77,29 +77,39 @@
                                 <!-- The character that is used for variable replacement in the Dockerfile-->
                                 <filter>@</filter>
                             </build>
-                            <external>
-                                <type>compose</type>
-                                <basedir>${project.basedir}/src/test/resources/docker</basedir>
-                            </external>
-                            <run>
-                                <wait>
-                                    <time>120000</time>
-                                    <log>3306 MySQL Community Server</log>
-                                </wait>
-                            </run>
                         </image>
                     </images>
                 </configuration>
-                <!-- I need to manually map the docker goals to the execution phases -->
+                <!-- I need to manually map the docker goals to the execution phases. -->
                 <!-- Unfortunately, mvn help:describe -Dcmd=verify will not show these custom execution mappings -->
                 <executions>
                     <execution>
                         <id>start</id>
                         <phase>pre-integration-test</phase>
                         <goals>
+                            <!-- Trying to stop any already running container.  -->
+                            <goal>stop</goal>
                             <goal>build</goal>
                             <goal>start</goal>
                         </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <external>
+                                        <type>compose</type>
+                                        <basedir>${project.basedir}/src/test/resources/docker</basedir>
+                                    </external>
+                                    <run>
+                                        <!-- I've tried to make the wait depend on the tcp port, but I didn't succeed -->
+                                        <!-- Let's wait for the log of mysql to mention that port 3306 is up and running -->
+                                        <wait>
+                                            <time>120000</time>
+                                            <log>port: 3306</log>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>stop</id>
