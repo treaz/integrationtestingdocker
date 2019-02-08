@@ -1,4 +1,4 @@
-package com.horiaconstantin.functional.testutils;
+package com.horiaconstantin.integration.testutils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

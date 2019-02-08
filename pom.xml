@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.horiaconstantin</groupId>
-    <artifactId>functionaltestingdocker</artifactId>
+    <artifactId>integrationtestingdocker</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 
@@ -120,7 +120,7 @@
                 <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**FunctionalTest.java</include>
+                        <include>**IntegrationTest.java</include>
                     </includes>
                     <systemPropertyVariables>
                         <docker.host.address>${docker.host.address}</docker.host.address>

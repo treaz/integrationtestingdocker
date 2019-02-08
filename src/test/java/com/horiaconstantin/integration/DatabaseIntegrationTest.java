@@ -1,6 +1,6 @@
-package com.horiaconstantin.functional;
+package com.horiaconstantin.integration;
 
-import com.horiaconstantin.functional.testutils.DatabaseTestUtilities;
+import com.horiaconstantin.integration.testutils.DatabaseTestUtilities;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -10,7 +10,7 @@ import java.sql.Statement;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class SimpleFunctionalTest {
+public class DatabaseIntegrationTest {
 
 
     @Test
