@@ -33,7 +33,11 @@ public class DatabaseTestUtilities {
     public Connection getMySqlConnection() throws Exception {
         Class<?> aClass = Class.forName("com.mysql.cj.jdbc.Driver");
 
-        String connectionUrl = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s&allowMultiQueries=true",
+        String connectionUrl = String.format("jdbc:mysql://%s:%d/%s?" +
+                        "user=%s&" +
+                        "password=%s&" +
+                        "allowMultiQueries=true&" +
+                        "sslMode=DISABLED",
                 mysqlHost, mysqlPort, dbName, username, password);
 
         return DriverManager.getConnection(connectionUrl);
