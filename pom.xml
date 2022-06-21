@@ -18,7 +18,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
 
-        <mysql-jdbc.version>8.0.13</mysql-jdbc.version>
+        <mysql-jdbc.version>8.0.28</mysql-jdbc.version>
         <junit.version>4.12</junit.version>
         <docker-maven-plugin.version>0.28.0</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M2</maven-failsafe-plugin.version>
